@@ -1,8 +1,9 @@
 node {
-    stage('test') 
+    stage('test') {
         sh 'echo this is scripting pipeline'
-}
+    }
     stage('learning') {
         git url: 'https://github.com/gautamshrinivas/spring-petclinic.git',
-            branch: 'master'
+            branch: 'main'
     }
+}
