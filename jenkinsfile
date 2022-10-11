@@ -1,0 +1,45 @@
+pipeline {
+    agent {label 'spring'}
+    parameters { 
+        choice(name: 'BRACH_TO_BUILD', choices: ['main', 'VER_1'], description: 'Choose the branch') 
+        string(name: 'MAVEN_GOAL', defaultValue: 'package', description: 'To build maven')
+    }
+    triggers {
+        pollSCM ('* * * * *')
+    }
+    stages {
+        stage(vcs) {
+            steps {
+            mail subject: 'Build Failed',
+                 body: 'Build Failed',
+                git url: 'https://github.com/gautamshrinivas/spring-petclinic.git',
+                branch: "${params.BRACH_TO_BUILD}"
+            }
+        }
+        stage(build) {
+            steps {
+            sh "mvn ${params.MAVEN_GOAL}"        
+            }
+        }
+        stage('archive resuls') {
+            steps {
+                 archive '**/target/*.jar'
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Job completed'
+            mail subject: 'Build Completed',
+                 body : 'Build Completed',
+        }
+        failure {
+            mail subject: 'Build Failed',
+                 body: 'Build Failed',
+                 to: 'gautamrck76@gmail.com'
+        }
+        success {
+            junit '**/surefire-reports/*.xml'
+        }
+    }
+}
