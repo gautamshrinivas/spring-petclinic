@@ -12,15 +12,14 @@ pipeline {
        stages {
            stage ('vcs') {
             steps {
+              mail subject: "Build Started for Jenkins JOB $env.JOB_NAME", 
+                   body: "Build Started for Jenkins JOB $env.JOB_NAME", 
+                   to: 'gautamrck76@gmail.com' 
               git url: 'https://github.com/gautamshrinivas/spring-petclinic.git',
               branch: "${params.BRACH_TO_BUILD}"
                 }
                            }
-           stage ('build') {
-            steps {
-              sh "${params.MAVEN_GOAL}"
-                 }
-            }
+           
             stage ('artifactory') {
              steps {
                rtMavenDeployer (
@@ -52,13 +51,13 @@ pipeline {
       post  {
         always {
             echo 'Job completed'
-            mail subject: 'result',
-                    body: 'Build Completed',
+            mail subject: 'Build Completed for Jenkins JOB $env.JOB_NAME',
+                    body: 'Build Completed for Jenkins JOB $env.JOB_NAME \n Click Here: $env.JOB_URL',
                   to: 'gautamrck76@gmail.com'
         }
         failure {
-            mail subject: 'Build Failed',
-                  body: 'Build Failed',
+            mail subject: 'Build Failed for Jenkins JOB $env.JOB_NAME with Build ID $env.BUILD_ID',
+                  body: 'Build Failed for Jenkins JOB $env.JOB_NAME',
                   to: 'gautamrck76@gmail.com'
         }
         success {
