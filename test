@@ -25,16 +25,16 @@ pipeline {
              steps {
                rtMavenDeployer (
                     id: "MAVEN_DEPLOYER",
-                    serverId: "JFROG_JENKINS",
-                    releaseRepo: "jenkins-libs-release-local",
-                    snapshotRepo: "jenkins-libs-snapshot-local"
+                    serverId: "jfrog123",
+                    releaseRepo: "chandu-libs-release-local",
+                    snapshotRepo: "chandu-libs-snapshot-local"
                 )
              }
             }
             stage ('Exec Maven') {
             steps {
                 rtMavenRun (
-                    tool: "MVN_DEFAULT", // Tool name from Jenkins configuration
+                    tool: "mvn3", // Tool name from Jenkins configuration
                     pom: 'pom.xml',
                     goals: 'clean install',
                     deployerId: "MAVEN_DEPLOYER"
@@ -44,7 +44,7 @@ pipeline {
          stage ('Publish build info') {
             steps {
                 rtPublishBuildInfo (
-                    serverId: "JFROG_JENKINS"
+                    serverId: "jfrog123"
                 )
             }
         }
@@ -54,12 +54,12 @@ pipeline {
             echo 'Job completed'
             mail subject: 'result',
                     body: 'Build Completed',
-                  to: 'gautamrck76@gmail.com'
+                  to: 'chandushine70@gmail.com'
         }
         failure {
             mail subject: 'Build Failed',
                   body: 'Build Failed',
-                  to: 'gautamrck76@gmail.com'
+                  to: 'chandushine70@gmail.com'
         }
         success {
             junit '**/surefire-reports/*.xml'
