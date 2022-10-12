@@ -10,8 +10,8 @@ pipeline {
     stages {
         stage(vcs) {
             steps {
-            mail subject: 'Build Failed',
-                 body: 'Build Failed',
+            mail subject: 'Build Started',
+                 body: 'Build Started',
                  to: 'gautamrck76@gmail.com',
                 git url: 'https://github.com/gautamshrinivas/spring-petclinic.git',
                 branch: "${params.BRACH_TO_BUILD}"
@@ -22,11 +22,33 @@ pipeline {
             sh "mvn ${params.MAVEN_GOAL}"        
             }
         }
-        stage('archive resuls') {
+        stage ('artifactory') {
+             steps {
+               rtMavenDeployer (
+                    id: "MAVEN_DEPLOYER",
+                    serverId: "JFROG_JENKINS",
+                    releaseRepo: "jenkins-libs-release-local",
+                    snapshotRepo: "jenkins-libs-snapshot-local"
+                )
+             }
+
+        stage('Exec Maven') {
             steps {
-                 archive '**/target/*.jar'
+                rtMavenRun(
+                tool: 'MVN_DEFAULT',
+                pom: 'pom.xml',
+                goals: 'clean install',
+                deployerId: 'MAVEN_DEPLOYER'
+                )
             }
         }
+        stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: "JFROG_JENKINS"
+                )
+            }
+
     }
     post {
         always {
@@ -44,4 +66,10 @@ pipeline {
             junit '**/surefire-reports/*.xml'
         }
     }
+        stage('archive results') {
+            steps {
+                 archive '**/target/*.jar'
+            }
+        }
+
 }
