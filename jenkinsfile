@@ -1,0 +1,22 @@
+pipleline {
+    agent { label 'petclinic'}
+    triggers {
+        cron()
+    }
+    parameters {
+       choice(name: 'BRANCH_TO_BUILD', choices: ['main', 'oct21'], description: 'for selecting branch')
+    }
+    stages {
+        stage ('vcs') {
+            steps {
+                git url: 'https://github.com/gautamshrinivas/spring-petclinic.git',
+                branch: "${params.BRANCH_TO_BUILD}"
+            }
+        }
+        stage ('build') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+    }
+}
