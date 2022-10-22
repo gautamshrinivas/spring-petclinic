@@ -1,5 +1,5 @@
 pipeline {
-       agent { label 'spring' }
+       agent { label 'node' }
        parameters {
            string(name: 'MAVEN_GOAL', defaultValue: 'mvn package', description: 'To build maven')
            choice(name: 'BRACH_TO_BUILD', choices: ['main', 'VER_1'], description: 'Choose the branch')
